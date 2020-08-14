@@ -20,7 +20,6 @@ class Index extends Component{
         isSendCode:false,
         countCodeTime:120,
         isOpenMsg:false,
-        msgKind:2,
         msgContent:"",
         baseUrl:"https://dgfhtry8fil8e8bas.cbasechain.org",
         codeIsDisable:false
@@ -56,14 +55,13 @@ class Index extends Component{
     registAccount= async ()=>{
         if(this.state.phoneCode && this.state.inviteCode && this.invalidPhone(this.state.phone) && this.state.password.length>10){
             axios.post(this.state.baseUrl+'/filebase/account/registerByPhone',{
-                Password:this.state.password,
+                Passwd:this.state.password,
                 InviteCode:this.state.inviteCode,
                 MobilePhone:this.state.phone,
                 VerifyCode:this.state.phoneCode,
-                OSType:'2',
+                OSType:2,
                 HTCDesire:'H5'
             }).then((regist_res)=>{
-                console.log("regist-res:",regist_res)
                 if(regist_res.data.code ==0){
                     console.log("注册成功")
                     this.setState({
@@ -71,25 +69,27 @@ class Index extends Component{
                         msgContent:"注册成功",
                         msgKind:1
                     })
+                }else if(regist_res.data.code==5){
+                    this.setState({
+                        isOpenMsg:true,
+                        msgContent:regist_res.data.msg,
+                    })
                 }else{
                     this.setState({
                         isOpenMsg:true,
                         msgContent:"注册失败",
-                        msgKind:2
                     })
                 }
             }).catch((err)=>{
                 this.setState({
                     isOpenMsg:true,
                     msgContent:"注册失败",
-                    msgKind:2
                 })
             })
         }else{
             this.setState({
                 isOpenMsg:true,
-                msgContent:"请输入注册信息",
-                msgKind:0
+                msgContent:"请输入正确信息",
             })
         }
         
@@ -111,7 +111,6 @@ class Index extends Component{
                 this.setState({
                     msgContent:'验证码已发送，请查收',
                     isOpenMsg:true,
-                    msgKind:1
                 })
                 if(codeRes.data && codeRes.data.code ==0){
                     console.log("验证码发送成功")
@@ -133,13 +132,17 @@ class Index extends Component{
                     this.setState({
                         isSendCode:true
                     })
+                }else{
+                    this.setState({
+                        msgContent:codeRes.data.msg,
+                        isOpenMsg:true,
+                    })
                 }
             }).catch((error)=>{
                 console.log("error--",error)
                 this.setState({
                     msgContent:'验证码发送失败',
                     isOpenMsg:true,
-                    msgKind:2,
                     codeIsDisable:false
                 })
             })
@@ -196,16 +199,17 @@ class Index extends Component{
     }
     render(){
         return (
-            <div className="relative  text-center">
+            <div className="  text-center">
+                <form>
                 <div>
-                    <img src="../static/img/banner.png"/>
+                    <img className="w-full" src="../static/img/banner.png"/>
                 </div>
                 <div className="flex bg-yellow-50 widthclass border-2 border-orange-200 mb-5 mt-10 h-12 items-center" >
                     <div className="w-1/3 text-left ml-4">
                         手机号码
                     </div>
                     <div className="w-1/3 ">
-                        <input onChange={(e)=>this.onChangePhone(e)}  className="bg-opacity-0 h-12" type="number" placeholder="请输入手机号"/>
+                        <input onChange={(e)=>this.onChangePhone(e)}  className=" bg-opacity-0 h-12" type="text" placeholder="请输入手机号"/>
                     </div>
                     <div className="w-1/4 text-right">
                         {this.state.phone_status?this.state.tips_true:this.state.tips_false}
@@ -227,7 +231,7 @@ class Index extends Component{
                         登陆密码
                     </div>
                     <div className="w-1/3">
-                        <input onChange={(e)=>this.onChangePwd(e)} type="password" placeholder="6-8位大小写字母、数字"/>
+                        <input onChange={(e)=>this.onChangePwd(e)} type="current-password" placeholder="6-8位大小写字母、数字"/>
                     </div>
                     <div className="w-1/4 text-right">
                     {this.state.pwd_status?this.state.tips_true:this.state.tips_false}
@@ -247,12 +251,20 @@ class Index extends Component{
                     </div>
                 </div>
                 <div className="text-right widthclass mt-3">
-                    已有注册账号，<a className="text-orange-400" href="#">立即下载</a>
+                    已有注册账号，<a className="text-orange-400" href="http://www.getfilebase.com">立即下载</a>
                 </div>
-                <Modal setStateModal={this.setStateModal} msgKind={this.state.msgKind} isOpenMsg={this.state.isOpenMsg} msgContent={this.state.msgContent} />
+                <Modal setStateModal={this.setStateModal} isOpenMsg={this.state.isOpenMsg} msgContent={this.state.msgContent} />
                 
-                {this.state.isOpenMsg?(
+                {this.state.isOpenMsg || this.state.isvisiable?(
                 <div className="fixed z-5 top-0 bg-gray-400 w-full h-full opacity-50"></div>):""}
+                {this.state.isvisiable?(
+                    <div className="z-6 top-0 fixed flex w-full h-full">
+                        <div className="flex-1  items-center opacity-75 pt-1/5 w-3/5 bg-yellow-100 h-full">
+                            <span>点击右上角浏览器中打开</span>
+                        </div>
+                    </div>
+                ):""}
+                </form>
             </div>
             
         )

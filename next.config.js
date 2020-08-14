@@ -112,4 +112,9 @@ module.exports = withBundleAnalyzer({
 
     return config
   },
+  exportPathMap: async function (defaultPathMap) {
+    return {
+      '/': { page: '/' }
+    }
+  }
 })
