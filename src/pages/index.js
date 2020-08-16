@@ -108,9 +108,11 @@ class Index extends Component{
                 AreaCode:'86',
                 MobilePhone:this.state.phone
             }).then((codeRes)=>{
+                console.log("codeRes--",codeRes)
                 this.setState({
                     msgContent:'验证码已发送，请查收',
                     isOpenMsg:true,
+                    codeIsDisable:false
                 })
                 if(codeRes.data && codeRes.data.code ==0){
                     console.log("验证码发送成功")
@@ -125,17 +127,20 @@ class Index extends Component{
                             this.setState({
                                 isSendCode:false,
                                 countCodeTime:120,
-                                codeIsDisable:false
+                                codeIsDisable:false,
+                                
                             })
                         }
                     },1000)
                     this.setState({
-                        isSendCode:true
+                        isSendCode:true,
+                        codeIsDisable:true
                     })
                 }else{
                     this.setState({
                         msgContent:codeRes.data.msg,
                         isOpenMsg:true,
+                        codeIsDisable:false
                     })
                 }
             }).catch((error)=>{
@@ -149,7 +154,8 @@ class Index extends Component{
         }else{
             this.setState({
                 isOpenMsg:true,
-                msgContent:"请输入正确的手机号"
+                msgContent:"请输入正确的手机号",
+                codeIsDisable:false
             })
         }
     }
@@ -158,7 +164,7 @@ class Index extends Component{
         return regex_phone.test(phone)
     }
     invalidPwd(pwd){
-        let regex_pwd = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[^]{6,8}$/;
+        let regex_pwd = /^[a-zA-Z0-9]{6,20}$$/;
         return regex_pwd.test(pwd)
     }
 
@@ -231,12 +237,13 @@ class Index extends Component{
                         登陆密码
                     </div>
                     <div className="w-1/3">
-                        <input onChange={(e)=>this.onChangePwd(e)} type="current-password" placeholder="6-8位大小写字母、数字"/>
+                        <input onChange={(e)=>this.onChangePwd(e)} type="password" placeholder="6-20位字母+数字"/>
                     </div>
                     <div className="w-1/4 text-right">
                     {this.state.pwd_status?this.state.tips_true:this.state.tips_false}
                     </div>
                 </div>
+                <div className="text-red-400 text-sm text-left pl-6">6-20位字母+数字</div>
                 <div className="flex bg-yellow-50 widthclass border-2 border-orange-200 mt-5 mb-8 h-12 items-center" >
                     <div className="w-1/3  text-left ml-4">
                         推荐码
